@@ -21,7 +21,7 @@
       const formData = ref({ table: '' });
       const tableMetaList = ref([]);
 
-      const addRecord = async () => {
+      const autoPlan = async () => {
         const tableId = formData.value.table;
         if (tableId) {
           const table = await bitable.base.getTableById(tableId);
@@ -38,7 +38,7 @@
       return {
         formData,
         tableMetaList,
-        addRecord,
+        autoPlan,
       };
     },
   };
@@ -90,7 +90,7 @@
           />
         </el-select>
     </el-form-item>
-    <el-button type="primary" plain size="large" @click="addRecord">新增一行记录</el-button>
+    <el-button type="primary" plain size="large" @click="autoPlan">自动排期</el-button>
   </el-form>
 </template>
 

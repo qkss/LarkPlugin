@@ -33,3 +33,6 @@ start = "typescript-language-server --stdio"
 [deployment]
 build = ["sh", "-c", "npm run build"]
 run = ["sh", "-c", "npm run preview"]
+
+[[ports]]
+localPort = 5173
