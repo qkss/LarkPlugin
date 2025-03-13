@@ -4,7 +4,8 @@ import Form from './components/Form.vue'
 
 <template>
   <main>
-    <h4>编辑 <code>src/App.vue</code> 并保存以重新加载</h4>
+    <h4>项目管理辅助插件</h4>
+    <br/>
     <Form />
   </main>
 </template>
