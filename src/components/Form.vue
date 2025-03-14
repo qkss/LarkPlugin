@@ -51,20 +51,21 @@
       const clearEmptyTask = async () => {
         const tableId = formData.value.table;
         const table = await bitable.base.getTableById(tableId);
-        const recordList = await table.getRecordList();
+        const result = await table.getRecords({pageSize:1500});
 
+        debugger;
         //删除任务为空的记录
         var ids = [];
-        for (const record of recordList) {
-          const taskCell = await record.getCellByField(formData.value.taskField);
-          if(taskCell==null) continue;
-
-          const taskVal = await taskCell.getValue();
-          if(taskVal==null) ids.push(record.id);
+        for (const record of result.records) {
+          const taskCell = record.fields[formData.value.taskField];
+          if(taskCell==null) ids.push(record.recordId);
         }
-        
         if(ids.length==0) return;
         await table.deleteRecords(ids);
+        await bitable.ui.showToast({
+          toastType: ToastType.info,
+          message: '已删除['+ids.length+']个空白任务'
+        })
       };
       
       const allAutoPlan = async () => {
