@@ -111,8 +111,13 @@ export class Scheduler {
         nextStart = end > timeline.current ? end + this.config.taskInterval * 3600000 : timeline.current;
       } else {
         start = timeline.current;
-        end = await this.calculateTaskEnd(start, task.hours);
-        nextStart = end + this.config.taskInterval * 3600000;
+
+        if (task.hours != 0) {
+          end = await this.calculateTaskEnd(start, task.hours);
+          nextStart = end + this.config.taskInterval * 3600000;
+        } else {
+          end = start;
+        }
       };
 
       // 更新当前时间线

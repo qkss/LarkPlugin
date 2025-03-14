@@ -9,6 +9,7 @@
     ElSelect,
     ElOption,
     ElSwitch,
+    ElTabsPane,
   } from 'element-plus';
 
   export default {
@@ -19,6 +20,7 @@
       ElSelect,
       ElOption,
       ElSwitch,
+      ElTabsPane,
     },
     setup() {
       const formData = ref({ 
@@ -47,13 +49,13 @@
         taskInterval: 1
       });
       
+      const initFieldSettings = async () => {};
       const checkPlan = async () => {};
       const clearEmptyTask = async () => {
         const tableId = formData.value.table;
         const table = await bitable.base.getTableById(tableId);
         const result = await table.getRecords({pageSize:1500});
 
-        debugger;
         //删除任务为空的记录
         var ids = [];
         for (const record of result.records) {
@@ -184,7 +186,8 @@
         stageNameList,
         checkPlan,
         allAutoPlan,
-        clearEmptyTask
+        clearEmptyTask,
+        initFieldSettings
       };
     }
   };
@@ -224,55 +227,64 @@
         </el-select>
     </el-form-item>
 
-    <el-form-item size="large">
-      <el-switch v-model="showAdvancedOptions" active-text="更多设置"/>
-    </el-form-item>
+    <el-tabs v-model="activeName" class="demo-tabs">
+      <el-tab-pane label="Plan" name="first">User
+        <el-form-item size="large">
+          <el-switch v-model="showAdvancedOptions" active-text="更多设置"/>
+        </el-form-item>
+
+        <div v-show="showAdvancedOptions">
+          <el-form-item label="开始时间" size="large">
+              <el-select v-model="formData.startTimeField" placeholder="请选择" style="width: 80%">
+                <el-option
+                  v-for="meta in fieldMetaList.dateTimeFields"
+                  :key="meta.id"
+                  :label="meta.name"
+                  :value="meta.id"
+                />
+              </el-select>
+          </el-form-item>
+          <el-form-item label="结束时间" size="large">
+              <el-select v-model="formData.endTimeField" placeholder="请选择" style="width: 80%">
+                <el-option
+                  v-for="meta in fieldMetaList.dateTimeFields"
+                  :key="meta.id"
+                  :label="meta.name"
+                  :value="meta.id"
+                />
+              </el-select>
+          </el-form-item>
+          <el-form-item label="工时" size="large">
+              <el-select v-model="formData.workHoursField" placeholder="请选择" style="width: 80%">
+                <el-option
+                  v-for="meta in fieldMetaList.numFields"
+                  :key="meta.id"
+                  :label="meta.name"
+                  :value="meta.id"
+                />
+              </el-select>
+          </el-form-item>
+          <el-form-item label="每日投入工时" size="large">
+              <el-input-number v-model="config.dailyWorkHours" :step="1" />
+          </el-form-item>
+        </div>
+
+        <el-form-item label="排期" size="large">
+          <el-button type="primary" plain size="large" @click="allAutoPlan">自动排期</el-button>
+          <el-button type="primary" plain size="large" @click="checkPlan">检查排期</el-button>
+
+        </el-form-item>
+
+        <el-form-item label="其他" size="large">
+          <el-button type="primary" plain size="large" @click="clearEmptyTask">删除空行</el-button>
+        </el-form-item>
+      </el-tab-pane>
+      <el-tab-pane label="Settings" name="second">
+
+        <el-button type="primary" plain size="large" @click="initFieldSettings">初始化字段设置</el-button>
+      </el-tab-pane>
+    </el-tabs>
     
-    <div v-show="showAdvancedOptions">
-      <el-form-item label="开始时间" size="large">
-          <el-select v-model="formData.startTimeField" placeholder="请选择" style="width: 80%">
-            <el-option
-              v-for="meta in fieldMetaList.dateTimeFields"
-              :key="meta.id"
-              :label="meta.name"
-              :value="meta.id"
-            />
-          </el-select>
-      </el-form-item>
-      <el-form-item label="结束时间" size="large">
-          <el-select v-model="formData.endTimeField" placeholder="请选择" style="width: 80%">
-            <el-option
-              v-for="meta in fieldMetaList.dateTimeFields"
-              :key="meta.id"
-              :label="meta.name"
-              :value="meta.id"
-            />
-          </el-select>
-      </el-form-item>
-      <el-form-item label="工时" size="large">
-          <el-select v-model="formData.workHoursField" placeholder="请选择" style="width: 80%">
-            <el-option
-              v-for="meta in fieldMetaList.numFields"
-              :key="meta.id"
-              :label="meta.name"
-              :value="meta.id"
-            />
-          </el-select>
-      </el-form-item>
-      <el-form-item label="每日投入工时" size="large">
-          <el-input-number v-model="config.dailyWorkHours" :step="1" />
-      </el-form-item>
-    </div>
-    
-    <el-form-item label="排期" size="large">
-      <el-button type="primary" plain size="large" @click="allAutoPlan">自动排期</el-button>
-      <el-button type="primary" plain size="large" @click="checkPlan">检查排期</el-button>
-      
-    </el-form-item>
-    
-    <el-form-item label="其他" size="large">
-      <el-button type="primary" plain size="large" @click="clearEmptyTask">删除空行</el-button>
-    </el-form-item>
     
   </el-form>
 </template>
