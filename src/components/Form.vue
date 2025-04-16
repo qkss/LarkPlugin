@@ -9,7 +9,8 @@
     ElSelect,
     ElOption,
     ElSwitch,
-    ElTabsPane,
+    ElTabs,
+    ElTabPane,
   } from 'element-plus';
 
   export default {
@@ -20,7 +21,8 @@
       ElSelect,
       ElOption,
       ElSwitch,
-      ElTabsPane,
+      ElTabs,
+      ElTabPane,
     },
     setup() {
       const formData = ref({ 
@@ -106,10 +108,10 @@
             recordId: recordId,
             name: taskCell[0]?.text,
             person: personCell[0]?.name,
-            hours: workHoursCell,
+            hours: workHoursCell||0,
             manual: manualCell,
-            startTime: startTimeCell,
-            endTime: endTimeCell
+            startTime: startTimeCell||0,
+            endTime: endTimeCell||0
           });
         }
 
@@ -216,19 +218,31 @@
         </el-select>
     </el-form-item>
 
-    <el-form-item label="选择阶段" size="large">
-        <el-select v-model="formData.stageName" placeholder="请选择阶段" style="width: 80%">
-          <el-option
-            v-for="meta in stageNameList"
-            :key="meta.name"
-            :label="meta.name"
-            :value="meta.name"
-          />
-        </el-select>
-    </el-form-item>
 
-    <el-tabs v-model="activeName" class="demo-tabs">
-      <el-tab-pane label="Plan" name="first">User
+    <el-tabs class="demo-tabs">
+      <el-tab-pane label="Plan" name="first">
+
+        <el-form-item label="选择阶段" size="large">
+            <el-select v-model="formData.stageName" placeholder="请选择阶段" style="width: 80%">
+              <el-option
+                v-for="meta in stageNameList"
+                :key="meta.name"
+                :label="meta.name"
+                :value="meta.name"
+              />
+            </el-select>
+        </el-form-item>
+
+        <el-form-item label="排期" size="large">
+          <el-button type="primary" plain size="large" @click="allAutoPlan">自动排期</el-button>
+          <el-button type="primary" plain size="large" @click="checkPlan">检查排期</el-button>
+
+        </el-form-item>
+
+        <el-form-item label="其他" size="large">
+          <el-button type="primary" plain size="large" @click="clearEmptyTask">删除空行</el-button>
+        </el-form-item>
+
         <el-form-item size="large">
           <el-switch v-model="showAdvancedOptions" active-text="更多设置"/>
         </el-form-item>
@@ -268,16 +282,6 @@
               <el-input-number v-model="config.dailyWorkHours" :step="1" />
           </el-form-item>
         </div>
-
-        <el-form-item label="排期" size="large">
-          <el-button type="primary" plain size="large" @click="allAutoPlan">自动排期</el-button>
-          <el-button type="primary" plain size="large" @click="checkPlan">检查排期</el-button>
-
-        </el-form-item>
-
-        <el-form-item label="其他" size="large">
-          <el-button type="primary" plain size="large" @click="clearEmptyTask">删除空行</el-button>
-        </el-form-item>
       </el-tab-pane>
       <el-tab-pane label="Settings" name="second">
 

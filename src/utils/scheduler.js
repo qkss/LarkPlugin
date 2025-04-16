@@ -112,6 +112,7 @@ export class Scheduler {
       } else {
         start = timeline.current;
 
+        debugger;
         if (task.hours != 0) {
           end = await this.calculateTaskEnd(start, task.hours);
           nextStart = end + this.config.taskInterval * 3600000;
@@ -121,10 +122,8 @@ export class Scheduler {
       };
 
       // 更新当前时间线
-      timeline.current = await this.adjustToWorkTime(nextStart);
-      // timelines.set(task.person, {
-      //   current: await this.adjustToWorkTime(nextStart)
-      // });
+      if (nextStart)
+        timeline.current = await this.adjustToWorkTime(nextStart);
 
       return {
         ...task,
