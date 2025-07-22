@@ -6,3 +6,6 @@ https://bytedance.feishu.cn/docx/HjCEd1sPzoVnxIxF3LrcKnepnUf
 
 ### Element Plus
 https://element-plus.org/zh-CN/component/form.html
+
+### JSSDK
+https://lark-base-team.github.io/js-sdk-docs/

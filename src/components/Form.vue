@@ -27,7 +27,11 @@
     setup() {
       const formData = ref({ 
         table: '',
+        tablePlan:'',
+        tableProgress:'',
+        tableQuality:'',
         view:'',
+        viewPlanByStage:'',
         taskField:'',
         stageField:'',
         stageName:'系统开发',
@@ -73,7 +77,7 @@
       };
       
       const allAutoPlan = async () => {
-        const tableId = formData.value.table;
+        const tableId = formData.value.tablePlan;
         const table = await bitable.base.getTableById(tableId);
 
         //获取视图内容
@@ -132,16 +136,96 @@
         
       };
 
+      const getPersonList = async () =>{
+        const tableId = formData.value.tablePlan;
+        const table = await bitable.base.getTableById(tableId);
+
+        //获取视图内容
+        const view = await table.getViewById(formData.value.viewPlanByStage);
+        const records =  await view.getVisibleRecordIdList();
+
+        const pMap = new Map(); 
+        const persons = [];
+        const recordList = await table.getRecordList();
+        var personField = await table.getField(formData.value.personField);
+        for (const record of recordList) {
+            var person = await personField.getValue(record.id);
+            if(person==null) continue;
+            person = person[0];
+            if (!pMap.has(person.id)) {
+              pMap.set(person.id, 0);
+              persons.push(person.id); 
+            }
+            
+        }
+        
+        return persons;
+      }
+
+      const stsProgress = async () => {
+        var persons = await getPersonList();
+        const tableId = formData.value.tableProgress;
+        const table = await bitable.base.getTableById(tableId);
+
+        const records = (await table.getRecordList()).recordList;
+        
+        const userField = await table.getField("人员");
+        for(const person of persons)
+        {
+          const personCell = await userField.createCell({id: person});
+          if(!records.find(({fields})=> (fields[userField.id])[0]?.id === person))
+            await table.addRecord(personCell);
+          
+        }
+        await bitable.ui.showToast({
+          toastType: ToastType.info,
+          message: '已统计完成'
+        })
+      }
+
+
+      const stsQuality = async () => {
+        var persons = await getPersonList();
+        const tableId = formData.value.tableQuality;
+        const table = await bitable.base.getTableById(tableId);
+        const records = (await table.getRecordList()).recordList;
+
+        const userField = await table.getField("人员");
+        for(const person of persons)
+        {
+          const personCell = await userField.createCell({id: person});
+          if(!records.find(({fields})=> (fields[userField.id])[0]?.id === person))
+            await table.addRecord(personCell);
+        }
+        await bitable.ui.showToast({
+          toastType: ToastType.info,
+          message: '已统计完成'
+        })
+      }
+
       onMounted(async () => {
         const [tableList, selection] = await Promise.all([bitable.base.getTableMetaList(), bitable.base.getSelection()]);
         formData.value.table = selection.tableId;
         formData.value.view = selection.viewId;
-        tableMetaList.value = tableList.filter(({name})=>name=="✅  任务计划")
+
+        //Progress, quality
+        formData.value.tablePlan = tableList.filter(({name})=>name=="✅  任务计划")[0].id;
+        formData.value.tableProgress = tableList.filter(({name})=>name=="项目成本")[0].id;
+        formData.value.tableQuality = tableList.filter(({name})=>name=="项目质量")[0].id;
+        
+        tableMetaList.value = formData.value.tablePlan;
         if(tableMetaList.value)
           formData.value.table = tableMetaList.value[0].id;
 
+
         //通过tableId获取table数据表。 Find current table by tableId
-        const table = await bitable.base.getTableById(selection?.tableId);
+        const tablePlan = await bitable.base.getTableById(formData.value.tablePlan);
+        //获取tabs的元信息。 Get tabs meta list
+        var planTabs = (await tablePlan.getViewMetaList()).filter(({name}) => name === "按阶段");
+        formData.value.viewPlanByStage = planTabs[0].id;
+
+        //通过tableId获取table数据表。 Find current table by tableId
+        const table = await bitable.base.getTableById(formData.value.tablePlan);
         //获取tabs的元信息。 Get tabs meta list
         viewMetaList.value = (await table.getViewMetaList()).filter(({type}) => type === ViewType.Grid);
         //获取table数据表的字段列表元信息。Get table's field meta list
@@ -188,6 +272,8 @@
         stageNameList,
         checkPlan,
         allAutoPlan,
+        stsProgress,
+        stsQuality,
         clearEmptyTask,
         initFieldSettings
       };
@@ -236,11 +322,15 @@
         <el-form-item label="排期" size="large">
           <el-button type="primary" plain size="large" @click="allAutoPlan">自动排期</el-button>
           <el-button type="primary" plain size="large" @click="checkPlan">检查排期</el-button>
-
+        </el-form-item>
+        
+        <el-form-item label="统计" size="large">
+          <el-button type="secondary" plain size="large" @click="stsProgress">统计进度</el-button>
+          <el-button type="secondary" plain size="large" @click="stsQuality">统计质量</el-button>
         </el-form-item>
 
         <el-form-item label="其他" size="large">
-          <el-button type="primary" plain size="large" @click="clearEmptyTask">删除空行</el-button>
+          <el-button type="secondary" plain size="large" @click="clearEmptyTask">删除空行</el-button>
         </el-form-item>
 
         <el-form-item size="large">
