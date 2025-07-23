@@ -28,7 +28,7 @@
       const formData = ref({ 
         table: '',
         tablePlan:'',
-        tableProgress:'',
+        tableCost:'',
         tableQuality:'',
         view:'',
         viewPlanByStage:'',
@@ -162,9 +162,9 @@
         return persons;
       }
 
-      const stsProgress = async () => {
+      const stsCost = async () => {
         var persons = await getPersonList();
-        const tableId = formData.value.tableProgress;
+        const tableId = formData.value.tableCost;
         const table = await bitable.base.getTableById(tableId);
 
         const records = (await table.getRecordList()).recordList;
@@ -208,9 +208,9 @@
         formData.value.table = selection.tableId;
         formData.value.view = selection.viewId;
 
-        //Progress, quality
-        formData.value.tablePlan = tableList.filter(({name})=>name=="✅  任务计划")[0].id;
-        formData.value.tableProgress = tableList.filter(({name})=>name=="项目成本")[0].id;
+        //Cost,mProgress, quality
+        formData.value.tablePlan = tableList.filter(({name})=>name=="🟩 计划任务")[0].id;
+        formData.value.tableCost = tableList.filter(({name})=>name=="项目成本")[0].id;
         formData.value.tableQuality = tableList.filter(({name})=>name=="项目质量")[0].id;
         
         tableMetaList.value = formData.value.tablePlan;
@@ -272,7 +272,7 @@
         stageNameList,
         checkPlan,
         allAutoPlan,
-        stsProgress,
+        stsCost,
         stsQuality,
         clearEmptyTask,
         initFieldSettings
@@ -325,8 +325,8 @@
         </el-form-item>
         
         <el-form-item label="统计" size="large">
-          <el-button type="secondary" plain size="large" @click="stsProgress">统计进度</el-button>
           <el-button type="secondary" plain size="large" @click="stsQuality">统计质量</el-button>
+          <el-button type="secondary" plain size="large" @click="stsCost">统计成本</el-button>
         </el-form-item>
 
         <el-form-item label="其他" size="large">
